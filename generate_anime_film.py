@@ -29,12 +29,12 @@ if not wan_repo_path.exists():
     subprocess.run(["git", "clone", "https://github.com/Wan-Video/Wan2.1.git"], check=True)
     os.chdir("Wan2.1")
     print("📦 Installing compatible dependencies for Python 3.8...")
-    # Install compatible versions - carefully balanced for Python 3.8
+    # Install compatible versions - use older versions with cached_download
     compatible_packages = [
-        "huggingface_hub==0.20.3",  
-        "accelerate==0.27.2",  # Older version that works with hub 0.20.3
+        "huggingface_hub==0.19.4",  # Has cached_download function
+        "accelerate==0.26.1",  # Compatible with hub 0.19.4
         "peft==0.13.2",  
-        "diffusers==0.27.2",  
+        "diffusers==0.26.3",  # Compatible with hub 0.19.4
         "torch>=2.0.0",
         "torchvision>=0.15.0",
         "opencv-python>=4.5.0",
