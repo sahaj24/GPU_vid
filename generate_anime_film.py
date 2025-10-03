@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Wan 2.2 14B Anime Short Film Generator
-High-quality video generation using A100 GPU (specifically GPU 1)
+High-qualit            print(f"\n📥 Downloading Wan 2.2 T2V A14B model to {self.checkpoint_dir}...") video generation using A100 GPU (specifically GPU 1)
 Resolution: 720p (1280x720), Anime style
 
 This script uses the native Wan repository instead of diffusers
@@ -59,14 +59,14 @@ import numpy as np
 from tqdm import tqdm
 
 class AnimeFilmGenerator:
-    def __init__(self, checkpoint_dir="./Wan2.2-T2V-14B", output_dir="./output"):
-        """Initialize the generator with Wan 2.2 14B model"""
+    def __init__(self, checkpoint_dir="./Wan2.2-T2V-A14B", output_dir="./output"):
+        """Initialize the generator with Wan 2.2 T2V A14B model (anime optimized)"""
         self.checkpoint_dir = Path(checkpoint_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
         print("=" * 80)
-        print("🎬 Wan 2.2 14B Anime Film Generator")
+        print("🎬 Wan 2.2 T2V A14B Anime Film Generator")
         print("=" * 80)
         print(f"📍 Using GPU: {torch.cuda.get_device_name(0)}")
         print(f"💾 VRAM Available: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
@@ -82,7 +82,7 @@ class AnimeFilmGenerator:
                 sys.executable, "-m", "pip", "install", "huggingface_hub[cli]"
             ])
             subprocess.run([
-                "huggingface-cli", "download", "Wan-AI/Wan2.2-T2V-14B",
+                "huggingface-cli", "download", "Wan-AI/Wan2.2-T2V-A14B",
                 "--local-dir", str(self.checkpoint_dir)
             ], check=True)
         
