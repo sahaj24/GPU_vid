@@ -30,9 +30,11 @@ if not wan_repo_path.exists():
     os.chdir("Wan2.1")
     print("📦 Installing compatible dependencies for Python 3.8...")
     # Install compatible versions instead of using requirements.txt
+    # These versions all work together without conflicts
     compatible_packages = [
+        "huggingface_hub==0.19.4",  # Compatible with diffusers 0.27.2
         "peft==0.13.2",  # Keep current version
-        "diffusers==0.27.2",  # Downgrade to compatible version
+        "diffusers==0.27.2",  # Compatible version
         "torch>=2.0.0",
         "torchvision>=0.15.0",
         "opencv-python>=4.5.0",
