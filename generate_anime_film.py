@@ -28,8 +28,25 @@ if not wan_repo_path.exists():
     print("📥 Cloning Wan repository...")
     subprocess.run(["git", "clone", "https://github.com/Wan-Video/Wan2.1.git"], check=True)
     os.chdir("Wan2.1")
-    print("📦 Installing dependencies...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+    print("📦 Installing compatible dependencies for Python 3.8...")
+    # Install compatible versions instead of using requirements.txt
+    compatible_packages = [
+        "torch>=2.0.0",
+        "torchvision>=0.15.0",
+        "opencv-python>=4.5.0",
+        "diffusers>=0.27.0",
+        "transformers==4.46.3",  # Latest compatible with Python 3.8
+        "accelerate>=0.20.0",
+        "sentencepiece>=0.1.99",
+        "protobuf>=3.20.0",
+        "Pillow>=9.0.0",
+        "numpy>=1.20.0",
+        "imageio>=2.9.0",
+        "imageio-ffmpeg>=0.4.0",
+    ]
+    for pkg in compatible_packages:
+        print(f"  Installing {pkg}...")
+        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", pkg])
     os.chdir("..")
 else:
     print("✅ Wan repository found")
