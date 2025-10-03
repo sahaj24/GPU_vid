@@ -76,7 +76,7 @@ def generate_video(
     print(f"🎯 Guidance Scale: {guidance_scale} | Steps: {steps}")
     print("="*80)
     
-    # Build command
+    # Build command - use only supported arguments
     cmd = [
         sys.executable,
         "Wan2.1/generate.py",
@@ -84,11 +84,10 @@ def generate_video(
         "--size", size,
         "--ckpt_dir", "Wan2.2-T2V-A14B",
         "--prompt", prompt,
-        "--negative_prompt", negative_prompt,
         "--sample_guide_scale", str(guidance_scale),
         "--sample_steps", str(steps),
         "--base_seed", str(seed),
-        "--output", output_path,
+        "--save_file", output_path,
     ]
     
     print(f"\n🚀 Generating video...")
