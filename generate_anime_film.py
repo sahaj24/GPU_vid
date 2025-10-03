@@ -11,11 +11,11 @@ import subprocess
 
 # Install/upgrade required packages before importing
 print("🔧 Checking and installing dependencies...")
-# Use compatible versions that work together
+# Use latest compatible versions that work together
 packages = [
-    "huggingface_hub==0.19.4",  # Compatible version
-    "peft==0.13.2",  # Use version that's actually available
-    "diffusers==0.27.2",  # Compatible with peft 0.13.2
+    "huggingface_hub>=0.23.0",
+    "peft>=0.13.0",
+    "diffusers>=0.30.0",
     "torch>=2.0.0",
     "transformers>=4.40.0",
     "accelerate>=0.30.0",
@@ -23,7 +23,7 @@ packages = [
 
 for package in packages:
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", package])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--quiet", package])
     except:
         print(f"⚠️  Warning: Could not install {package}")
 
@@ -41,7 +41,7 @@ from tqdm import tqdm
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 class AnimeFilmGenerator:
-    def __init__(self, model_id="Wan-AI/Wan2.1-T2V-14B-Diffusers", output_dir="./output"):
+    def __init__(self, model_id="Wan-AI/Wan2.2-T2V-A14B-Diffusers", output_dir="./output"):
         """Initialize the generator with Wan 2.2 14B model"""
         self.model_id = model_id
         self.output_dir = Path(output_dir)
