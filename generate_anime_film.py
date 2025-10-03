@@ -29,25 +29,24 @@ if not wan_repo_path.exists():
     subprocess.run(["git", "clone", "https://github.com/Wan-Video/Wan2.1.git"], check=True)
     os.chdir("Wan2.1")
     print("📦 Installing compatible dependencies for Python 3.8...")
-    # Install compatible versions instead of using requirements.txt
-    # These versions all work together without conflicts
+    # Install compatible versions - carefully balanced for Python 3.8
     compatible_packages = [
-        "huggingface_hub==0.20.3",  # Compatible with diffusers 0.27.2
-        "peft==0.13.2",  # Keep current version
-        "diffusers==0.27.2",  # Compatible version
+        "huggingface_hub==0.20.3",  
+        "accelerate==0.27.2",  # Older version that works with hub 0.20.3
+        "peft==0.13.2",  
+        "diffusers==0.27.2",  
         "torch>=2.0.0",
         "torchvision>=0.15.0",
         "opencv-python>=4.5.0",
-        "transformers==4.46.3",  # Latest compatible with Python 3.8
-        "accelerate>=0.20.0",
+        "transformers==4.46.3",
         "sentencepiece>=0.1.99",
         "protobuf>=3.20.0",
         "Pillow>=9.0.0",
         "numpy>=1.20.0",
         "imageio>=2.9.0",
         "imageio-ffmpeg>=0.4.0",
-        "easydict>=1.9",  # Required by Wan
-        "einops>=0.6.0",  # Required by Wan
+        "easydict>=1.9",
+        "einops>=0.6.0",
     ]
     for pkg in compatible_packages:
         print(f"  Installing {pkg}...")
