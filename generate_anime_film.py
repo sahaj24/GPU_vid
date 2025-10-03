@@ -31,10 +31,11 @@ if not wan_repo_path.exists():
     print("📦 Installing compatible dependencies for Python 3.8...")
     # Install compatible versions instead of using requirements.txt
     compatible_packages = [
+        "peft==0.13.2",  # Keep current version
+        "diffusers==0.27.2",  # Downgrade to compatible version
         "torch>=2.0.0",
         "torchvision>=0.15.0",
         "opencv-python>=4.5.0",
-        "diffusers>=0.27.0",
         "transformers==4.46.3",  # Latest compatible with Python 3.8
         "accelerate>=0.20.0",
         "sentencepiece>=0.1.99",
