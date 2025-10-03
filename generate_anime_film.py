@@ -43,6 +43,8 @@ if not wan_repo_path.exists():
         "numpy>=1.20.0",
         "imageio>=2.9.0",
         "imageio-ffmpeg>=0.4.0",
+        "easydict>=1.9",  # Required by Wan
+        "einops>=0.6.0",  # Required by Wan
     ]
     for pkg in compatible_packages:
         print(f"  Installing {pkg}...")
