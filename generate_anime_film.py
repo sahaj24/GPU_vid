@@ -3,47 +3,48 @@
 Wan 2.2 14B Anime Short Film Generator
 High-quality video generation using A100 GPU (specifically GPU 1)
 Resolution: 720p (1280x720), Anime style
+
+This script uses the native Wan repository instead of diffusers
 """
 
 import os
 import sys
 import subprocess
-
-# Install/upgrade required packages before importing
-print("🔧 Checking and installing dependencies...")
-# Use latest compatible versions that work together
-packages = [
-    "huggingface_hub>=0.23.0",
-    "peft>=0.13.0",
-    "diffusers>=0.30.0",
-    "torch>=2.0.0",
-    "transformers>=4.40.0",
-    "accelerate>=0.30.0",
-]
-
-for package in packages:
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--quiet", package])
-    except:
-        print(f"⚠️  Warning: Could not install {package}")
-
-import torch
 import time
 from datetime import timedelta
 from pathlib import Path
-import numpy as np
-from diffusers import AutoencoderKLWan, WanPipeline
-from diffusers.schedulers.scheduling_unipc_multistep import UniPCMultistepScheduler
-from diffusers.utils import export_to_video
-from tqdm import tqdm
 
 # Force use of GPU 1 only
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
+print("=" * 80)
+print("🎬 Wan 2.2 14B Anime Film Generator")
+print("=" * 80)
+print("📦 Setting up environment...")
+
+# Clone Wan repository if not exists
+wan_repo_path = Path("Wan2.1")
+if not wan_repo_path.exists():
+    print("📥 Cloning Wan repository...")
+    subprocess.run(["git", "clone", "https://github.com/Wan-Video/Wan2.1.git"], check=True)
+    os.chdir("Wan2.1")
+    print("📦 Installing dependencies...")
+    subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+    os.chdir("..")
+else:
+    print("✅ Wan repository found")
+
+# Add Wan to path
+sys.path.insert(0, str(wan_repo_path))
+
+import torch
+import numpy as np
+from tqdm import tqdm
+
 class AnimeFilmGenerator:
-    def __init__(self, model_id="Wan-AI/Wan2.2-T2V-A14B-Diffusers", output_dir="./output"):
+    def __init__(self, checkpoint_dir="./Wan2.2-T2V-14B", output_dir="./output"):
         """Initialize the generator with Wan 2.2 14B model"""
-        self.model_id = model_id
+        self.checkpoint_dir = Path(checkpoint_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
@@ -55,52 +56,25 @@ class AnimeFilmGenerator:
         print(f"📂 Output Directory: {self.output_dir.absolute()}")
         print("=" * 80)
         
-        self._load_models()
-    
-    def _load_models(self):
-        """Load VAE, scheduler, and pipeline"""
-        print("\n🔄 Loading models...")
-        start_time = time.time()
+        # Download model if not exists
+        if not self.checkpoint_dir.exists():
+            print(f"\n� Downloading Wan 2.2 14B model to {self.checkpoint_dir}...")
+            print("   This is a one-time download (~50GB)")
+            self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
+            subprocess.run([
+                sys.executable, "-m", "pip", "install", "huggingface_hub[cli]"
+            ])
+            subprocess.run([
+                "huggingface-cli", "download", "Wan-AI/Wan2.2-T2V-14B",
+                "--local-dir", str(self.checkpoint_dir)
+            ], check=True)
         
-        # Load VAE in float32 for better quality
-        print("  📦 Loading VAE...")
-        self.vae = AutoencoderKLWan.from_pretrained(
-            self.model_id, 
-            subfolder="vae", 
-            torch_dtype=torch.float32
-        )
-        
-        # Setup scheduler for 720p (flow_shift=5.0)
-        print("  ⚙️  Setting up scheduler...")
-        self.scheduler = UniPCMultistepScheduler(
-            prediction_type='flow_prediction',
-            use_flow_sigmas=True,
-            num_train_timesteps=1000,
-            flow_shift=5.0  # 5.0 for 720P, 3.0 for 480P
-        )
-        
-        # Load main pipeline
-        print("  🚀 Loading Wan 2.2 14B pipeline...")
-        self.pipe = WanPipeline.from_pretrained(
-            self.model_id,
-            vae=self.vae,
-            torch_dtype=torch.bfloat16
-        )
-        self.pipe.scheduler = self.scheduler
-        self.pipe.to("cuda")
-        
-        # Enable memory optimizations for A100
-        print("  🔧 Enabling memory optimizations...")
-        self.pipe.enable_model_cpu_offload()
-        
-        load_time = time.time() - start_time
-        print(f"✅ Models loaded in {load_time:.2f}s")
-        print(f"💾 Current VRAM usage: {torch.cuda.memory_allocated() / 1e9:.2f} GB")
+        print("\n✅ Setup complete!")
     
     def generate_scene(self, prompt, negative_prompt=None, scene_name="scene", 
                       num_frames=81, fps=16, guidance_scale=5.0, num_inference_steps=50):
         """
-        Generate a single scene from prompt
+        Generate a single scene from prompt using native Wan CLI
         
         Args:
             prompt: Text description of the scene (anime style)
@@ -108,16 +82,14 @@ class AnimeFilmGenerator:
             scene_name: Name for the output file
             num_frames: Number of frames (81 = ~5 seconds at 16fps)
             fps: Frames per second for output video
-            guidance_scale: Classifier-free guidance scale (higher = more prompt adherence)
-            num_inference_steps: Number of denoising steps (more = better quality)
+            guidance_scale: Classifier-free guidance scale
+            num_inference_steps: Number of denoising steps
         """
         if negative_prompt is None:
-            # Default negative prompt for anime style
             negative_prompt = (
                 "realistic photo, photorealistic, live action, 3d render, "
                 "blurry, low quality, distorted, deformed, ugly, bad anatomy, "
-                "watermark, text, subtitle, logo, static, still image, "
-                "jpeg artifacts, compression, oversaturated"
+                "watermark, text, subtitle, logo, static, still image"
             )
         
         # Add anime style to prompt
@@ -133,44 +105,41 @@ class AnimeFilmGenerator:
         print("=" * 80)
         
         # Calculate estimated time
-        est_time_per_step = 2.0  # seconds (conservative estimate)
+        est_time_per_step = 2.0
         est_total = est_time_per_step * num_inference_steps
         print(f"⏱️  Estimated time: {str(timedelta(seconds=int(est_total)))}")
         
         start_time = time.time()
-        torch.cuda.reset_peak_memory_stats()
-        
-        # Generate with progress tracking
-        with torch.inference_mode():
-            output = self.pipe(
-                prompt=full_prompt,
-                negative_prompt=negative_prompt,
-                height=720,
-                width=1280,
-                num_frames=num_frames,
-                guidance_scale=guidance_scale,
-                num_inference_steps=num_inference_steps,
-            ).frames[0]
-        
-        # Calculate metrics
-        generation_time = time.time() - start_time
-        peak_vram = torch.cuda.max_memory_allocated() / 1e9
-        fps_achieved = num_frames / generation_time
-        
-        # Save video
         output_path = self.output_dir / f"{scene_name}.mp4"
-        print(f"\n💾 Saving video to: {output_path}")
-        export_to_video(output, str(output_path), fps=fps)
+        
+        # Run Wan generation using CLI
+        cmd = [
+            sys.executable,
+            "Wan2.1/generate.py",
+            "--task", "t2v-14B",
+            "--size", "1280*720",
+            "--ckpt_dir", str(self.checkpoint_dir),
+            "--prompt", full_prompt,
+            "--negative_prompt", negative_prompt,
+            "--sample_guide_scale", str(guidance_scale),
+            "--sample_steps", str(num_inference_steps),
+            "--base_seed", "42",
+            "--output", str(output_path)
+        ]
+        
+        print("\n🚀 Running generation...")
+        subprocess.run(cmd, check=True)
+        
+        generation_time = time.time() - start_time
         
         # Print statistics
         print("\n" + "=" * 80)
         print("✅ GENERATION COMPLETE")
         print("=" * 80)
         print(f"⏱️  Generation Time: {str(timedelta(seconds=int(generation_time)))}")
-        print(f"🎞️  Processing Speed: {fps_achieved:.2f} frames/second")
-        print(f"💾 Peak VRAM Used: {peak_vram:.2f} GB")
         print(f"📁 Output: {output_path}")
-        print(f"📏 File Size: {output_path.stat().st_size / 1e6:.2f} MB")
+        if output_path.exists():
+            print(f"📏 File Size: {output_path.stat().st_size / 1e6:.2f} MB")
         print("=" * 80)
         
         return str(output_path)
