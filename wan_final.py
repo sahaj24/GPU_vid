@@ -80,7 +80,7 @@ def generate_video(
     cmd = [
         sys.executable,
         "Wan2.2/generate.py",
-        "--task", "t2v-14B",
+        "--task", "t2v-A14B",  # Changed for Wan2.2
         "--size", size,
         "--ckpt_dir", "Wan2.2-T2V-A14B",
         "--prompt", prompt,
