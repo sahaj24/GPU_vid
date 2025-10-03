@@ -13,6 +13,7 @@ import subprocess
 print("🔧 Checking and installing dependencies...")
 # Use compatible versions that work together
 packages = [
+    "huggingface_hub==0.19.4",  # Compatible version
     "peft==0.13.2",  # Use version that's actually available
     "diffusers==0.27.2",  # Compatible with peft 0.13.2
     "torch>=2.0.0",
