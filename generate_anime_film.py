@@ -11,17 +11,18 @@ import subprocess
 
 # Install/upgrade required packages before importing
 print("🔧 Checking and installing dependencies...")
+# Use compatible versions that work together
 packages = [
-    "peft>=0.17.0",
+    "peft==0.13.2",  # Use version that's actually available
+    "diffusers==0.27.2",  # Compatible with peft 0.13.2
     "torch>=2.0.0",
-    "diffusers>=0.30.0",
     "transformers>=4.40.0",
     "accelerate>=0.30.0",
 ]
 
 for package in packages:
     try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--quiet", package])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", package])
     except:
         print(f"⚠️  Warning: Could not install {package}")
 
