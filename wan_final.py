@@ -16,12 +16,12 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
 
 def check_wan_repo():
     """Check if Wan repository exists, clone if not"""
-    if not os.path.exists("Wan2.1"):
-        print("📥 Cloning Wan2.1 repository...")
-        subprocess.run(["git", "clone", "https://github.com/wapchief/Wan.git", "Wan2.1"], check=True)
+    if not os.path.exists("Wan2.2"):
+        print("📥 Cloning Wan2.2 repository...")
+        subprocess.run(["git", "clone", "https://github.com/Wan-Video/Wan2.2.git", "Wan2.2"], check=True)
         print("✅ Repository cloned")
     else:
-        print("✅ Wan2.1 repository found")
+        print("✅ Wan2.2 repository found")
 
 def check_model():
     """Check if model exists"""
@@ -79,7 +79,7 @@ def generate_video(
     # Build command - use only supported arguments
     cmd = [
         sys.executable,
-        "Wan2.1/generate.py",
+        "Wan2.2/generate.py",
         "--task", "t2v-14B",
         "--size", size,
         "--ckpt_dir", "Wan2.2-T2V-A14B",
