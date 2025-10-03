@@ -7,6 +7,24 @@ Resolution: 720p (1280x720), Anime style
 
 import os
 import sys
+import subprocess
+
+# Install/upgrade required packages before importing
+print("🔧 Checking and installing dependencies...")
+packages = [
+    "peft>=0.17.0",
+    "torch>=2.0.0",
+    "diffusers>=0.30.0",
+    "transformers>=4.40.0",
+    "accelerate>=0.30.0",
+]
+
+for package in packages:
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--quiet", package])
+    except:
+        print(f"⚠️  Warning: Could not install {package}")
+
 import torch
 import time
 from datetime import timedelta
@@ -210,26 +228,9 @@ class AnimeFilmGenerator:
 def main():
     """Main execution function"""
     
-    # Try to load scenes from script.txt first
-    from script_parser import parse_script, validate_scenes, create_example_script
-    
-    script_file = Path(__file__).parent / "script.txt"
-    scenes = []
-    
-    if script_file.exists() and script_file.stat().st_size > 0:
-        print("📖 Reading script from script.txt...")
-        scenes = parse_script(str(script_file))
-        if scenes:
-            validate_scenes(scenes)
-    
-    # If no script found or parsing failed, use example scenes
-    if not scenes:
-        print("\n💡 No script found or script is empty.")
-        print("   Using example scenes...")
-        print("   Run 'python script_parser.py --create-example' to create a template.\n")
-        
-        # Example scenes for anime short film
-        scenes = [
+    # Example scenes for anime short film
+    # Edit the prompts below to create your custom short film
+    scenes = [
         {
             'name': 'opening',
             'prompt': (
