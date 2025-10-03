@@ -32,7 +32,7 @@ if not wan_repo_path.exists():
     # Install compatible versions instead of using requirements.txt
     # These versions all work together without conflicts
     compatible_packages = [
-        "huggingface_hub==0.19.4",  # Compatible with diffusers 0.27.2
+        "huggingface_hub==0.20.3",  # Compatible with diffusers 0.27.2
         "peft==0.13.2",  # Keep current version
         "diffusers==0.27.2",  # Compatible version
         "torch>=2.0.0",
