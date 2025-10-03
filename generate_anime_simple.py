@@ -116,13 +116,20 @@ def generate_video(
         print(f"\n🔧 Loading model on GPU 1...")
         print(f"💾 VRAM before: {torch.cuda.max_memory_allocated(0) / 1024**3:.2f} GB")
         
-        # Load the pipeline
-        model_id = "wapchief/Wan2.2-T2V-A14B"
+        # Load the pipeline from local directory
+        model_path = "./Wan2.2-T2V-A14B"
+        
+        if not os.path.exists(model_path):
+            print(f"❌ Model not found at {model_path}")
+            print(f"Please download the model first or check the path")
+            return None
+        
+        print(f"📂 Loading from local path: {model_path}")
         
         pipe = DiffusionPipeline.from_pretrained(
-            model_id,
+            model_path,
             torch_dtype=torch.float16,
-            variant="fp16",
+            local_files_only=True,
         )
         pipe.to("cuda")
         pipe.enable_model_cpu_offload()
