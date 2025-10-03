@@ -31,24 +31,61 @@ def install_dependencies():
         "numpy",
     ]
     
+    # Suppress warnings during import check
+    import warnings
+    warnings.filterwarnings('ignore')
+    
+    missing = []
     try:
         import torch
+    except ImportError:
+        missing.append("torch")
+    
+    try:
         import diffusers
+    except ImportError:
+        missing.append("diffusers")
+    
+    try:
         import transformers
+    except ImportError:
+        missing.append("transformers")
+    
+    try:
         import accelerate
+    except ImportError:
+        missing.append("accelerate")
+    
+    try:
         import cv2
+    except ImportError:
+        missing.append("opencv-python")
+    
+    try:
         import imageio
+    except ImportError:
+        missing.append("imageio")
+    
+    try:
         from PIL import Image
+    except ImportError:
+        missing.append("Pillow")
+    
+    try:
         import numpy
-        print("✅ All dependencies installed")
-    except ImportError as e:
-        print(f"⚠️  Missing dependency: {e}")
+    except ImportError:
+        missing.append("numpy")
+    
+    if missing:
+        print(f"⚠️  Missing packages: {', '.join(missing)}")
         print("Installing required packages...")
         for pkg in packages:
             subprocess.run([sys.executable, "-m", "pip", "install", "-U", pkg], 
-                         check=False)
+                         check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("\n⚠️  Please restart the script after dependencies are installed")
         sys.exit(0)
+    
+    print("✅ All dependencies installed")
 
 def generate_video(
     prompt,
