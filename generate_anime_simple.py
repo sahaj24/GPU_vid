@@ -41,14 +41,14 @@ def install_dependencies():
         from PIL import Image
         import numpy
         print("✅ All dependencies installed")
-        return True
     except ImportError as e:
         print(f"⚠️  Missing dependency: {e}")
         print("Installing required packages...")
         for pkg in packages:
             subprocess.run([sys.executable, "-m", "pip", "install", "-U", pkg], 
                          check=False)
-        return False
+        print("\n⚠️  Please restart the script after dependencies are installed")
+        sys.exit(0)
 
 def generate_video(
     prompt,
@@ -153,9 +153,7 @@ def main():
     print("=" * 80)
     
     # Install dependencies
-    if not install_dependencies():
-        print("\n⚠️  Please restart the script after dependencies are installed")
-        return
+    install_dependencies()
     
     # Create output directory
     output_dir = Path("output")
